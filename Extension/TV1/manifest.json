@@ -1,0 +1,55 @@
+{
+  "manifest_version": 3,
+  "name": "TradingView DZ/SZ Discord Alert",
+  "version": "1.0.0",
+  "description": "แจ้งเตือนสัญญาณ Demand Zone (DZ) และ Supply Zone (SZ) บน TradingView เมื่อแท่งปิด เข้า Discord อัตโนมัติ",
+  "permissions": [
+    "storage",
+    "alarms",
+    "activeTab",
+    "scripting",
+    "tabs"
+  ],
+  "host_permissions": [
+    "*://*.tradingview.com/*",
+    "*://tradingview.com/*",
+    "https://discord.com/api/webhooks/*",
+    "https://discordapp.com/api/webhooks/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "sidepanel.html",
+    "default_title": "TradingView DZ/SZ Alert Panel",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.tradingview.com/*",
+        "*://tradingview.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["icon.png"],
+      "matches": ["*://*.tradingview.com/*", "*://tradingview.com/*"]
+    }
+  ]
+}

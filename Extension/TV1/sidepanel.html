@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradingView DZ/SZ Alert</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body class="dark-theme">
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <img src="icon.png" alt="Logo" class="app-logo">
+        <div class="brand-info">
+          <h1 class="brand-title">TV DZ/SZ Alert</h1>
+          <span class="brand-subtitle">Discord Signal Bot</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div id="statusBadge" class="status-badge status-stopped">
+          <span class="status-dot"></span>
+          <span id="statusText">STOPPED</span>
+        </div>
+        <button id="btnPopout" class="icon-btn" title="เปิดหน้าต่างแยก (Pop-out Window)">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Controls -->
+    <section class="control-section">
+      <div class="control-btn-grid">
+        <button id="btnPlay" class="control-btn btn-play" title="เริ่มการทำงานเบื้องหลัง">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span>Play</span>
+        </button>
+        <button id="btnStop" class="control-btn btn-stop" title="หยุดการทำงาน">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <rect x="6" y="6" width="12" height="12" rx="2"></rect>
+          </svg>
+          <span>Stop</span>
+        </button>
+        <button id="btnTest" class="control-btn btn-test" title="ทดสอบส่งสัญญาณเข้า Discord">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span>Test</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Live Chart Status Card -->
+    <section class="card status-card">
+      <div class="card-header">
+        <span class="card-title">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+          สถานะหน้ากราฟ (Live TV Status)
+        </span>
+        <span id="tabConnectedBadge" class="badge badge-disconnected">Offline</span>
+      </div>
+      <div class="chart-info-grid">
+        <div class="info-box">
+          <span class="info-label">Symbol</span>
+          <span id="liveSymbol" class="info-value">-</span>
+        </div>
+        <div class="info-box">
+          <span class="info-label">Timeframe</span>
+          <span id="liveTimeframe" class="info-value">-</span>
+        </div>
+        <div class="info-box countdown-box">
+          <span class="info-label">Candle Close In</span>
+          <span id="liveCountdown" class="info-value timer-value">--:--</span>
+        </div>
+        <div class="info-box">
+          <span class="info-label">Last Price</span>
+          <span id="livePrice" class="info-value">-</span>
+        </div>
+      </div>
+      
+      <!-- Last Signal Banner -->
+      <div id="lastSignalBox" class="last-signal-box">
+        <span class="last-signal-label">สัญญาณล่าสุด:</span>
+        <span id="lastSignalText" class="last-signal-value">ยังไม่มีสัญญาณ</span>
+      </div>
+    </section>
+
+    <!-- Settings Form -->
+    <section class="card settings-card">
+      <div class="card-header">
+        <span class="card-title">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          การตั้งค่า (Settings)
+        </span>
+      </div>
+
+      <form id="settingsForm" class="settings-form">
+        <!-- Discord Webhook Input -->
+        <div class="form-group">
+          <label for="webhookUrl" class="form-label">
+            <span>Discord Webhook URL</span>
+            <span class="required">*</span>
+          </label>
+          <div class="input-with-actions">
+            <input type="password" id="webhookUrl" placeholder="https://discord.com/api/webhooks/..." autocomplete="off">
+            <button type="button" id="btnToggleWebhook" class="icon-input-btn" title="แสดง/ซ่อน Webhook URL">
+              <svg id="eyeIcon" viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+          <small class="form-hint">วาง URL ของ Discord Webhook ที่ต้องการให้ส่งแจ้งเตือน</small>
+        </div>
+
+        <!-- Select TimeFrame -->
+        <div class="form-group">
+          <label class="form-label">
+            <span>Select TimeFrame (เลือก TimeFrame ที่ตรวจจับ)</span>
+          </label>
+          <div class="timeframe-pills" id="timeframePills">
+            <button type="button" class="tf-pill" data-tf="1M">1M</button>
+            <button type="button" class="tf-pill" data-tf="5M">5M</button>
+            <button type="button" class="tf-pill active" data-tf="15M">15M</button>
+            <button type="button" class="tf-pill" data-tf="30M">30M</button>
+            <button type="button" class="tf-pill" data-tf="1H">1H</button>
+            <button type="button" class="tf-pill" data-tf="4H">4H</button>
+            <button type="button" class="tf-pill" data-tf="1D">1D</button>
+          </div>
+          <input type="hidden" id="selectedTimeframe" value="15M">
+        </div>
+
+        <!-- Options Checkboxes -->
+        <div class="form-group">
+          <label class="checkbox-container">
+            <input type="checkbox" id="chkCandleClose" checked>
+            <span class="checkbox-checkmark"></span>
+            <span class="checkbox-text">ตรวจสอบเฉพาะเมื่อแท่งเทียนปิด (Check on Candle Close)</span>
+          </label>
+          <label class="checkbox-container">
+            <input type="checkbox" id="chkAttachScreenshot" checked>
+            <span class="checkbox-checkmark"></span>
+            <span class="checkbox-text">แนบรูปถ่ายหน้าจอกราฟเข้า Discord (Attach Chart Snapshot)</span>
+          </label>
+          <label class="checkbox-container">
+            <input type="checkbox" id="chkPlaySound" checked>
+            <span class="checkbox-checkmark"></span>
+            <span class="checkbox-text">เปิดเสียงแจ้งเตือนในเบราว์เซอร์ (Sound Alert)</span>
+          </label>
+        </div>
+
+        <!-- Advanced Keyword Matching (Collapsible) -->
+        <details class="advanced-settings">
+          <summary class="advanced-summary">
+            <span>ตัวเลือกคำค้นหาสัญญาณเพิ่มเติม (Keywords)</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </summary>
+          <div class="advanced-body">
+            <div class="form-group">
+              <label for="dzKeywords" class="form-label-small">คำค้นหา Demand Zone (DZ)</label>
+              <input type="text" id="dzKeywords" value="DZ, Demand, Buy Zone, Bullish OB" placeholder="คั่นด้วยเครื่องหมายจุลภาค ,">
+            </div>
+            <div class="form-group">
+              <label for="szKeywords" class="form-label-small">คำค้นหา Supply Zone (SZ)</label>
+              <input type="text" id="szKeywords" value="SZ, Supply, Sell Zone, Bearish OB" placeholder="คั่นด้วยเครื่องหมายจุลภาค ,">
+            </div>
+          </div>
+        </details>
+
+        <!-- Save & Cancel Buttons -->
+        <div class="form-action-buttons">
+          <button type="submit" id="btnSave" class="btn-primary">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            <span>บันทึก</span>
+          </button>
+          <button type="button" id="btnCancel" class="btn-secondary">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+            <span>ยกเลิก</span>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Activity & Signal Logs -->
+    <section class="card logs-card">
+      <div class="card-header">
+        <span class="card-title">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+          </svg>
+          ประวัติการทำงาน (Activity Logs)
+        </span>
+        <button id="btnClearLogs" class="btn-text-action" title="ล้างรายการ Log">ล้างบันทึก</button>
+      </div>
+      <div id="logContainer" class="log-container">
+        <div class="log-entry log-info">
+          <span class="log-time">--:--:--</span>
+          <span class="log-msg">พร้อมทำงาน กดปุ่ม [Play] เพื่อเริ่มตรวจจับสัญญาณ</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+  </div>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>
